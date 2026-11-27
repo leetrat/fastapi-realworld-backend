@@ -114,6 +114,13 @@ class CommentCreateException(BaseInternalException):
     _message = "Failed to create comment."
 
 
+class NotificationNotFoundException(BaseInternalException):
+    """Exception raised when notification not found for the current user."""
+
+    _status_code = 404
+    _message = "Notification with this id does not exist."
+
+
 class EmailAlreadyTakenException(BaseInternalException):
     """Exception raised when email was found in database while registration."""
 

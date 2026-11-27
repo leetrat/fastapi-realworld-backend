@@ -21,6 +21,7 @@ from conduit.interfaces.repositories.article import IArticleRepository
 from conduit.interfaces.repositories.article_tag import IArticleTagRepository
 from conduit.interfaces.repositories.favorite import IFavoriteRepository
 from conduit.interfaces.services.article import IArticleService
+from conduit.interfaces.services.notification import INotificationService
 from conduit.interfaces.services.profile import IProfileService
 
 
@@ -33,11 +34,13 @@ class ArticleService(IArticleService):
         article_tag_repo: IArticleTagRepository,
         favorite_repo: IFavoriteRepository,
         profile_service: IProfileService,
+        notification_service: INotificationService,
     ) -> None:
         self._article_repo = article_repo
         self._article_tag_repo = article_tag_repo
         self._favorite_repo = favorite_repo
         self._profile_service = profile_service
+        self._notification_service = notification_service
 
     async def create_new_article(
         self, session: AsyncSession, author_id: int, article_to_create: CreateArticleDTO
@@ -172,6 +175,12 @@ class ArticleService(IArticleService):
 
         await self._favorite_repo.create(
             session=session, article_id=article.id, user_id=current_user.id
+        )
+        await self._notification_service.notify_about_favorite(
+            session=session,
+            recipient_id=article.author_id,
+            actor_id=current_user.id,
+            article_id=article.id,
         )
         return ArticleDTO.with_updated_fields(
             dto=article,

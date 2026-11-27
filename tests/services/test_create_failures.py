@@ -70,6 +70,11 @@ class _NoopProfileService:
         raise AssertionError("Not expected to be called")
 
 
+class _NoopNotificationService:
+    async def notify_about_comment(self, *_: object, **__: object) -> None:
+        return None
+
+
 @pytest.mark.anyio
 async def test_article_create_raises_create_exception() -> None:
     service = ArticleService(
@@ -77,6 +82,7 @@ async def test_article_create_raises_create_exception() -> None:
         article_tag_repo=_NoopArticleTagRepo(),
         favorite_repo=_NoopFavoriteRepo(),
         profile_service=_NoopProfileService(),
+        notification_service=_NoopNotificationService(),
     )
     create_article_dto = CreateArticleDTO(
         title="title", description="desc", body="body", tags=[]
@@ -112,6 +118,7 @@ async def test_comment_create_raises_create_exception() -> None:
         article_repo=_ArticleRepo(),
         comment_repo=_FailingCommentRepo(),
         profile_service=_NoopProfileService(),
+        notification_service=_NoopNotificationService(),
     )
     with pytest.raises(CommentCreateException):
         await service.create_article_comment(

@@ -87,3 +87,17 @@ class Comment(Base):
     body: Mapped[str]
     created_at: Mapped[datetime]
     updated_at: Mapped[datetime] = mapped_column(nullable=True)
+
+
+class Notification(Base):
+    __tablename__ = "notification"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    recipient_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    actor_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    type: Mapped[str] = mapped_column(nullable=False)
+    article_id: Mapped[int | None] = mapped_column(
+        ForeignKey("article.id", ondelete="SET NULL"), nullable=True
+    )
+    read_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime]

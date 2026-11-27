@@ -5,6 +5,7 @@ from conduit.api.routes import (
     authentication,
     comment,
     health_check,
+    notification,
     profile,
     tag,
     users,
@@ -23,3 +24,6 @@ router.include_router(router=profile.router, tags=["Profiles"], prefix="/profile
 router.include_router(router=tag.router, tags=["Tags"], prefix="/tags")
 router.include_router(router=article.router, tags=["Articles"], prefix="/articles")
 router.include_router(router=comment.router, tags=["Comments"], prefix="/articles")
+router.include_router(
+    router=notification.router, tags=["Notifications"], prefix="/notifications"
+)

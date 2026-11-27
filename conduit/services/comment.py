@@ -9,6 +9,7 @@ from conduit.dtos.records.comment import CommentRecordDTO
 from conduit.interfaces.repositories.article import IArticleRepository
 from conduit.interfaces.repositories.comment import ICommentRepository
 from conduit.interfaces.services.comment import ICommentService
+from conduit.interfaces.services.notification import INotificationService
 from conduit.interfaces.services.profile import IProfileService
 
 
@@ -18,10 +19,12 @@ class CommentService(ICommentService):
         article_repo: IArticleRepository,
         comment_repo: ICommentRepository,
         profile_service: IProfileService,
+        notification_service: INotificationService,
     ) -> None:
         self._article_repo = article_repo
         self._comment_repo = comment_repo
         self._profile_service = profile_service
+        self._notification_service = notification_service
 
     async def create_article_comment(
         self,
@@ -41,6 +44,12 @@ class CommentService(ICommentService):
             )
         except (NoResultFound, MultipleResultsFound) as exc:
             raise CommentCreateException() from exc
+        await self._notification_service.notify_about_comment(
+            session=session,
+            recipient_id=article.author_id,
+            actor_id=current_user.id,
+            article_id=article.id,
+        )
         return CommentDTO.from_record(record=comment_record_dto, author=profile)
 
     async def get_article_comments(
