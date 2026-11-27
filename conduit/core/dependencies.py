@@ -9,6 +9,7 @@ from conduit.core.providers import (
     get_auth_token_service,
     get_comment_service,
     get_db_session,
+    get_notification_service,
     get_profile_service,
     get_tag_service,
     get_user_auth_service,
@@ -20,6 +21,7 @@ from conduit.services.article import ArticleService
 from conduit.services.auth import UserAuthService
 from conduit.services.auth_token import AuthTokenService
 from conduit.services.comment import CommentService
+from conduit.services.notification import NotificationService
 from conduit.services.profile import ProfileService
 from conduit.services.tag import TagService
 from conduit.services.user import UserService
@@ -49,6 +51,7 @@ IProfileService = Annotated[ProfileService, Depends(get_profile_service)]
 ITagService = Annotated[TagService, Depends(get_tag_service)]
 IArticleService = Annotated[ArticleService, Depends(get_article_service)]
 ICommentService = Annotated[CommentService, Depends(get_comment_service)]
+INotificationService = Annotated[NotificationService, Depends(get_notification_service)]
 
 DEFAULT_ARTICLES_LIMIT = 20
 DEFAULT_ARTICLES_OFFSET = 0

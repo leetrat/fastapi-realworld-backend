@@ -11,6 +11,7 @@ from conduit.core.exceptions import (
 from conduit.dtos.domain.profile import ProfileDTO
 from conduit.dtos.domain.user import UserDTO
 from conduit.interfaces.repositories.follower import IFollowerRepository
+from conduit.interfaces.services.notification import INotificationService
 from conduit.interfaces.services.profile import IProfileService
 from conduit.interfaces.services.user import IUserService
 
@@ -20,9 +21,15 @@ logger = get_logger()
 class ProfileService(IProfileService):
     """Service to handle user profiles and following logic."""
 
-    def __init__(self, user_service: IUserService, follower_repo: IFollowerRepository):
+    def __init__(
+        self,
+        user_service: IUserService,
+        follower_repo: IFollowerRepository,
+        notification_service: INotificationService,
+    ):
         self._user_service = user_service
         self._follower_repo = follower_repo
+        self._notification_service = notification_service
 
     async def get_profile_by_username(
         self, session: AsyncSession, username: str, current_user: UserDTO | None = None
@@ -100,6 +107,9 @@ class ProfileService(IProfileService):
 
         await self._follower_repo.create(
             session=session, follower_id=current_user.id, following_id=target_user.id
+        )
+        await self._notification_service.notify_about_follow(
+            session=session, recipient_id=target_user.id, actor_id=current_user.id
         )
 
     async def unfollow_user(
